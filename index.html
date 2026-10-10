@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArchVision Pro – 3D Architectural Design for Civil Engineers</title>
+  <meta name="description" content="Professional 3D house construction and architectural design application for civil engineers. Design, measure, inspect and present complete houses in 3D." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════ SPLASH / PROJECT MANAGER ═══════════════════ -->
+<div id="splash-screen" class="splash-screen">
+  <div class="splash-bg"></div>
+  <div class="splash-content">
+    <div class="splash-logo">
+      <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+        <rect width="56" height="56" rx="14" fill="url(#logoGrad)"/>
+        <path d="M28 10L44 20V36L28 46L12 36V20L28 10Z" stroke="white" stroke-width="2" fill="none"/>
+        <path d="M28 10V46M12 20L44 36M44 20L12 36" stroke="white" stroke-width="1.2" opacity="0.5"/>
+        <circle cx="28" cy="28" r="5" fill="white"/>
+        <defs>
+          <linearGradient id="logoGrad" x1="0" y1="0" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#3B82F6"/>
+            <stop offset="1" stop-color="#6366F1"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div>
+        <div class="splash-title">ArchVision Pro</div>
+        <div class="splash-subtitle">3D Architectural Design Platform</div>
+      </div>
+    </div>
+
+    <div class="splash-panels">
+      <!-- New Project -->
+      <div class="splash-card" id="btn-new-project">
+        <div class="splash-card-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12h14"/></svg>
+        </div>
+        <div class="splash-card-title">New Project</div>
+        <div class="splash-card-desc">Start a fresh architectural design from scratch</div>
+      </div>
+      <!-- Sample: 2-Story Villa -->
+      <div class="splash-card sample-card" data-sample="villa" id="btn-sample-villa">
+        <div class="splash-card-icon sample">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9.5L12 3l9 6.5V21H3V9.5z"/><path d="M9 21V12h6v9"/></svg>
+        </div>
+        <div class="splash-card-title">Sample: 2-Story Villa</div>
+        <div class="splash-card-desc">15m × 12m plot · 2 floors · 4 bedrooms</div>
+        <div class="splash-card-tag">SAMPLE</div>
+      </div>
+      <!-- Sample: Apartment Floor -->
+      <div class="splash-card sample-card" data-sample="apartment" id="btn-sample-apt">
+        <div class="splash-card-icon sample">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        </div>
+        <div class="splash-card-title">Sample: Row House</div>
+        <div class="splash-card-desc">8m × 20m plot · Ground + 1st floor</div>
+        <div class="splash-card-tag">SAMPLE</div>
+      </div>
+    </div>
+
+    <div class="splash-disclaimer">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <span>Design & visualization tool only. All structural sizing presets are user-configurable placeholders. Designs must be validated by a qualified structural engineer per applicable local codes before construction.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ NEW PROJECT DIALOG ═══════════════════ -->
+<div id="new-project-dialog" class="dialog-overlay" style="display:none">
+  <div class="dialog-box" style="max-width:560px">
+    <div class="dialog-header">
+      <span>New Project Setup</span>
+      <button class="dialog-close" id="close-new-project">✕</button>
+    </div>
+    <div class="dialog-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Project Name</label>
+          <input type="text" id="proj-name" value="My House Design" class="form-input" placeholder="Project name" />
+        </div>
+        <div class="form-group full">
+          <label>Client / Owner</label>
+          <input type="text" id="proj-client" value="" class="form-input" placeholder="Optional" />
+        </div>
+        <div class="form-group">
+          <label>Plot Width</label>
+          <div class="input-unit-row">
+            <input type="number" id="proj-plot-w" value="15" class="form-input" min="1" />
+            <span class="unit-badge" id="unit-badge-w">m</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Plot Depth</label>
+          <div class="input-unit-row">
+            <input type="number" id="proj-plot-d" value="12" class="form-input" min="1" />
+            <span class="unit-badge" id="unit-badge-d">m</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Number of Floors</label>
+          <input type="number" id="proj-floors" value="2" class="form-input" min="1" max="10" />
+        </div>
+        <div class="form-group">
+          <label>Floor-to-Floor Height</label>
+          <div class="input-unit-row">
+            <input type="number" id="proj-fh" value="3" class="form-input" step="0.1" min="2" />
+            <span class="unit-badge">m</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Units</label>
+          <select id="proj-units" class="form-input">
+            <option value="m">Meters (m)</option>
+            <option value="cm">Centimeters (cm)</option>
+            <option value="mm">Millimeters (mm)</option>
+            <option value="ft">Feet / Inches</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>North Direction</label>
+          <select id="proj-north" class="form-input">
+            <option value="N">North (top)</option>
+            <option value="E">East (right)</option>
+            <option value="S">South (bottom)</option>
+            <option value="W">West (left)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Wall Thickness (default)</label>
+          <div class="input-unit-row">
+            <input type="number" id="proj-wall-t" value="0.23" class="form-input" step="0.01" min="0.05" />
+            <span class="unit-badge">m</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Slab Thickness (default)</label>
+          <div class="input-unit-row">
+            <input type="number" id="proj-slab-t" value="0.15" class="form-input" step="0.01" min="0.05" />
+            <span class="unit-badge">m</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn-secondary" id="cancel-new-project">Cancel</button>
+      <button class="btn-primary" id="confirm-new-project">Create Project →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APPLICATION ═══════════════════ -->
+<div id="app" class="app-layout" style="display:none">
+
+  <!-- TOP TOOLBAR -->
+  <header class="top-bar" id="top-bar">
+    <div class="top-bar-left">
+      <div class="app-logo-sm">
+        <svg width="28" height="28" viewBox="0 0 56 56" fill="none">
+          <rect width="56" height="56" rx="10" fill="url(#lg2)"/>
+          <path d="M28 10L44 20V36L28 46L12 36V20L28 10Z" stroke="white" stroke-width="2.5" fill="none"/>
+          <circle cx="28" cy="28" r="5" fill="white"/>
+          <defs><linearGradient id="lg2" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#3B82F6"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
+        </svg>
+        <span class="app-name-sm">ArchVision Pro</span>
+      </div>
+      <div class="toolbar-sep"></div>
+      <span class="proj-name-display" id="proj-name-display">My House Design</span>
+      <div class="toolbar-sep"></div>
+      <!-- Undo/Redo -->
+      <button class="tb-btn" id="btn-undo" title="Undo (Ctrl+Z)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      </button>
+      <button class="tb-btn" id="btn-redo" title="Redo (Ctrl+Y)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 9.5 20H13"/></svg>
+      </button>
+      <div class="toolbar-sep"></div>
+      <!-- View mode -->
+      <div class="view-mode-group">
+        <button class="vm-btn active" id="vm-3d" title="3D View">3D</button>
+        <button class="vm-btn" id="vm-2d" title="2D Floor Plan">2D</button>
+        <button class="vm-btn" id="vm-elev" title="Elevations">ELEV</button>
+        <button class="vm-btn" id="vm-section" title="Section">SEC</button>
+      </div>
+    </div>
+
+    <div class="top-bar-center">
+      <!-- Floor selector -->
+      <div class="floor-selector" id="floor-selector">
+        <span class="floor-label">Floor:</span>
+        <div class="floor-tabs" id="floor-tabs">
+          <!-- populated by JS -->
+        </div>
+        <button class="floor-add-btn" id="btn-add-floor" title="Add floor">+</button>
+      </div>
+    </div>
+
+    <div class="top-bar-right">
+      <div class="units-display" id="units-display">m</div>
+      <div class="toolbar-sep"></div>
+      <button class="tb-btn" id="btn-save" title="Save Project">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      </button>
+      <button class="tb-btn" id="btn-export-pdf" title="Export PDF">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Export
+      </button>
+      <button class="tb-btn accent" id="btn-render" title="Render Mode">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Render
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN BODY -->
+  <div class="app-body">
+
+    <!-- LEFT PANEL: Tools + Library -->
+    <aside class="left-panel" id="left-panel">
+      <!-- Tool tabs -->
+      <div class="panel-tabs">
+        <button class="pt-tab active" data-tab="tools" id="tab-tools">Tools</button>
+        <button class="pt-tab" data-tab="library" id="tab-library">Library</button>
+        <button class="pt-tab" data-tab="layers" id="tab-layers">Layers</button>
+      </div>
+
+      <!-- TOOLS TAB -->
+      <div class="tab-content active" id="tab-content-tools">
+        <div class="tool-section">
+          <div class="tool-section-title">SELECT & VIEW</div>
+          <div class="tool-grid">
+            <button class="tool-btn active" data-tool="select" id="tool-select" title="Select (V)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-7 1-4 7z"/></svg>
+              <span>Select</span>
+            </button>
+            <button class="tool-btn" data-tool="measure" id="tool-measure" title="Measure (M)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M6 8l-4 4 4 4M18 8l4 4-4 4"/></svg>
+              <span>Measure</span>
+            </button>
+            <button class="tool-btn" data-tool="orbit" id="tool-orbit" title="Orbit (O)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12c0-4 4-7 10-7s10 3 10 7"/><path d="M2 12c0 4 4 7 10 7s10-3 10-7"/></svg>
+              <span>Orbit</span>
+            </button>
+            <button class="tool-btn" data-tool="pan" id="tool-pan" title="Pan (H)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v18M16 3v18M3 8h18M3 16h18"/></svg>
+              <span>Pan</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">STRUCTURE</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="wall" id="tool-wall" title="Draw Wall (W)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="10" rx="1"/><path d="M3 12h18M10 7v10M17 7v10"/></svg>
+              <span>Wall</span>
+            </button>
+            <button class="tool-btn" data-tool="partition" id="tool-partition" title="Partition Wall">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18" stroke-dasharray="2 2"/><rect x="2" y="5" width="20" height="14" rx="1"/></svg>
+              <span>Partition</span>
+            </button>
+            <button class="tool-btn" data-tool="column" id="tool-column" title="Column/Pillar">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="2" width="8" height="20" rx="1"/><rect x="6" y="2" width="12" height="3" rx="1"/><rect x="6" y="19" width="12" height="3" rx="1"/></svg>
+              <span>Column</span>
+            </button>
+            <button class="tool-btn" data-tool="beam" id="tool-beam" title="Beam">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="9" width="20" height="6" rx="1"/><path d="M6 9V5M18 9V5"/></svg>
+              <span>Beam</span>
+            </button>
+            <button class="tool-btn" data-tool="slab" id="tool-slab" title="Slab/Floor">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="10" width="20" height="4" rx="1"/><path d="M6 10V7M12 10V7M18 10V7M6 14v3M12 14v3M18 14v3"/></svg>
+              <span>Slab</span>
+            </button>
+            <button class="tool-btn" data-tool="foundation" id="tool-foundation" title="Foundation/Footing">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 18h20M4 14h16v4H4z"/><path d="M6 10h12v4H6z"/><path d="M9 6h6v4H9z"/></svg>
+              <span>Found.</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">OPENINGS</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="door" id="tool-door" title="Door (D)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V4a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1v16"/><path d="M2 20h20"/><circle cx="16" cy="12" r="1" fill="currentColor"/></svg>
+              <span>Door</span>
+            </button>
+            <button class="tool-btn" data-tool="window" id="tool-window" title="Window (N)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 12h18M12 3v18"/></svg>
+              <span>Window</span>
+            </button>
+            <button class="tool-btn" data-tool="lintel" id="tool-lintel" title="Lintel">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="4" rx="1"/><path d="M7 9v10M17 9v10"/></svg>
+              <span>Lintel</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">VERTICAL CIRCULATION</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="stair" id="tool-stair" title="Stairs">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h4v-4h4v-4h4v-4h4V5h2"/></svg>
+              <span>Stairs</span>
+            </button>
+            <button class="tool-btn" data-tool="ramp" id="tool-ramp" title="Ramp">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 20L21 4"/><path d="M3 20h18"/><path d="M21 4v16"/></svg>
+              <span>Ramp</span>
+            </button>
+            <button class="tool-btn" data-tool="railing" id="tool-railing" title="Railing/Parapet">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8h20M2 16h20M7 8v8M12 8v8M17 8v8"/></svg>
+              <span>Railing</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">ROOF & EXTERIOR</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="roof" id="tool-roof" title="Roof">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 12h4v10h4v-6h4v6h4V12h4z"/></svg>
+              <span>Roof</span>
+            </button>
+            <button class="tool-btn" data-tool="balcony" id="tool-balcony" title="Balcony/Terrace">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="14" width="20" height="4" rx="1"/><path d="M6 14V10h12v4"/><path d="M4 18v2M12 18v2M20 18v2"/></svg>
+              <span>Balcony</span>
+            </button>
+            <button class="tool-btn" data-tool="room" id="tool-room" title="Define Room">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12"/></svg>
+              <span>Room</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="tool-section">
+          <div class="tool-section-title">LIGHTING & CEILING</div>
+          <div class="tool-grid">
+            <button class="tool-btn" data-tool="light" id="tool-light" title="Place Light">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              <span>Light</span>
+            </button>
+            <button class="tool-btn" data-tool="fan" id="tool-fan" title="Ceiling Fan">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2"/><path d="M12 2c0 3-2 5-5 5M12 2c0 3 2 5 5 5M22 12c-3 0-5-2-5-5M22 12c-3 0-5 2-5 5M12 22c0-3 2-5 5-5M12 22c0-3-2-5-5-5M2 12c3 0 5 2 5 5M2 12c3 0 5-2 5-5"/></svg>
+              <span>Fan</span>
+            </button>
+            <button class="tool-btn" data-tool="false-ceiling" id="tool-false-ceiling" title="False Ceiling">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="3" rx="1"/><rect x="4" y="9" width="16" height="2" rx="1"/><path d="M6 11v8M18 11v8"/></svg>
+              <span>F.Ceil</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIBRARY TAB -->
+      <div class="tab-content" id="tab-content-library">
+        <div class="library-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="lib-search" placeholder="Search objects..." class="lib-search-input" />
+        </div>
+        <div class="lib-categories" id="lib-categories">
+          <!-- populated by JS -->
+        </div>
+        <div class="lib-grid" id="lib-grid">
+          <!-- populated by JS -->
+        </div>
+      </div>
+
+      <!-- LAYERS TAB -->
+      <div class="tab-content" id="tab-content-layers">
+        <div class="layers-toolbar">
+          <button class="layers-btn" id="btn-show-all">Show All</button>
+          <button class="layers-btn" id="btn-hide-all">Hide All</button>
+        </div>
+        <div class="layers-list" id="layers-list">
+          <!-- populated by JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER: 3D/2D WORKSPACE -->
+    <main class="workspace" id="workspace">
+      <canvas id="three-canvas" class="three-canvas"></canvas>
+
+      <!-- 2D Overlay Canvas -->
+      <canvas id="plan-canvas" class="plan-canvas" style="display:none"></canvas>
+
+      <!-- Viewport Controls -->
+      <div class="viewport-controls" id="viewport-controls">
+        <button class="vp-btn" id="vp-fit" title="Fit to View">⊞</button>
+        <button class="vp-btn" id="vp-top" title="Top View">T</button>
+        <button class="vp-btn" id="vp-front" title="Front View">F</button>
+        <button class="vp-btn" id="vp-side" title="Side View">S</button>
+        <button class="vp-btn" id="vp-persp" title="Perspective">P</button>
+        <div class="vp-sep"></div>
+        <button class="vp-btn" id="vp-wireframe" title="Wireframe">W</button>
+        <button class="vp-btn" id="vp-grid" title="Toggle Grid">G</button>
+        <button class="vp-btn" id="vp-shadow" title="Shadows">☀</button>
+      </div>
+
+      <!-- Measurement HUD -->
+      <div class="measure-hud" id="measure-hud" style="display:none">
+        <span id="measure-text">Click to start measuring</span>
+      </div>
+
+      <!-- Active tool indicator -->
+      <div class="active-tool-badge" id="active-tool-badge">Select</div>
+
+      <!-- 2D Plan overlays -->
+      <div class="plan-overlay" id="plan-overlay" style="display:none">
+        <div class="plan-info">
+          <span id="plan-floor-label">Ground Floor Plan</span>
+          <span id="plan-scale">Scale 1:100</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: Properties -->
+    <aside class="right-panel" id="right-panel">
+      <div class="rp-header">
+        <span id="rp-title">Properties</span>
+        <button class="rp-collapse" id="btn-collapse-rp" title="Collapse panel">›</button>
+      </div>
+
+      <!-- Project info -->
+      <div class="rp-section" id="rp-project">
+        <div class="rp-section-title">PROJECT</div>
+        <div class="rp-row">
+          <span class="rp-label">Name</span>
+          <span class="rp-value" id="rp-proj-name">—</span>
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Plot</span>
+          <span class="rp-value" id="rp-proj-plot">—</span>
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Floors</span>
+          <span class="rp-value" id="rp-proj-floors">—</span>
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Units</span>
+          <span class="rp-value" id="rp-proj-units">—</span>
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Total Area</span>
+          <span class="rp-value accent" id="rp-proj-area">—</span>
+        </div>
+      </div>
+
+      <!-- Selection properties (shown when something selected) -->
+      <div class="rp-section" id="rp-selection" style="display:none">
+        <div class="rp-section-title" id="rp-sel-type">SELECTED OBJECT</div>
+        <div id="rp-sel-fields">
+          <!-- dynamic -->
+        </div>
+        <div class="rp-action-row" id="rp-sel-actions">
+          <button class="rp-action-btn danger" id="btn-delete-sel">🗑 Delete</button>
+          <button class="rp-action-btn" id="btn-duplicate-sel">⧉ Duplicate</button>
+        </div>
+      </div>
+
+      <!-- Material/Finish -->
+      <div class="rp-section" id="rp-material" style="display:none">
+        <div class="rp-section-title">MATERIAL & FINISH</div>
+        <div class="material-picker" id="material-picker">
+          <!-- dynamic -->
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Color</span>
+          <input type="color" id="mat-color" class="color-picker" value="#d4c5a9" />
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Roughness</span>
+          <input type="range" id="mat-rough" min="0" max="1" step="0.05" value="0.7" class="rp-slider" />
+        </div>
+        <div class="rp-row">
+          <span class="rp-label">Metalness</span>
+          <input type="range" id="mat-metal" min="0" max="1" step="0.05" value="0" class="rp-slider" />
+        </div>
+      </div>
+
+      <!-- Rooms summary -->
+      <div class="rp-section" id="rp-rooms">
+        <div class="rp-section-title">ROOM SCHEDULE</div>
+        <div class="rooms-list" id="rooms-list">
+          <!-- dynamic -->
+        </div>
+        <div class="rp-row total-row">
+          <span class="rp-label">Total Built Area</span>
+          <span class="rp-value accent" id="rp-total-area">0.00 m²</span>
+        </div>
+      </div>
+
+      <!-- Component schedule -->
+      <div class="rp-section" id="rp-schedule">
+        <div class="rp-section-title">COMPONENT SCHEDULE</div>
+        <div class="schedule-grid" id="schedule-grid">
+          <!-- dynamic -->
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- STATUS BAR -->
+  <footer class="status-bar">
+    <div class="sb-left">
+      <span id="sb-coords">X: 0.00 &nbsp; Y: 0.00 &nbsp; Z: 0.00</span>
+      <span class="sb-sep">|</span>
+      <span id="sb-objects">Objects: 0</span>
+      <span class="sb-sep">|</span>
+      <span id="sb-rooms-count">Rooms: 0</span>
+    </div>
+    <div class="sb-center">
+      <span id="sb-hint">Select a tool from the left panel to begin.</span>
+    </div>
+    <div class="sb-right">
+      <span id="sb-snap">⊕ Snap ON</span>
+      <span class="sb-sep">|</span>
+      <span id="sb-grid-size">Grid: 0.5m</span>
+      <span class="sb-sep">|</span>
+      <span id="sb-saved">● Unsaved</span>
+    </div>
+  </footer>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div id="toast" class="toast" style="display:none"></div>
+
+<!-- EXPORT DIALOG -->
+<div id="export-dialog" class="dialog-overlay" style="display:none">
+  <div class="dialog-box" style="max-width:420px">
+    <div class="dialog-header">
+      <span>Export Project</span>
+      <button class="dialog-close" id="close-export">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="dialog-desc">Choose export format for your architectural drawings and model.</p>
+      <div class="export-options">
+        <button class="export-opt" id="exp-pdf">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>PDF Drawing Sheet</span>
+          <small>Floor plans, elevations, sections</small>
+        </button>
+        <button class="export-opt" id="exp-png">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span>PNG Image</span>
+          <small>Current view as high-res image</small>
+        </button>
+        <button class="export-opt" id="exp-json">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Project JSON</span>
+          <small>Full project data for backup/reload</small>
+        </button>
+      </div>
+      <div class="export-meta">
+        <div class="form-group">
+          <label>Sheet Title</label>
+          <input type="text" id="exp-title" class="form-input" value="FLOOR PLAN" />
+        </div>
+        <div class="form-group">
+          <label>Scale</label>
+          <select id="exp-scale" class="form-input">
+            <option>1:50</option>
+            <option selected>1:100</option>
+            <option>1:200</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn-secondary" id="cancel-export">Cancel</button>
+      <button class="btn-primary" id="confirm-export">Export →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
